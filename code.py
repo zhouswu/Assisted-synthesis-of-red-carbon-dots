@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix
+from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix,f1_score
 from numpy.random import seed
 seed(111)
 import matplotlib.pyplot as plt
@@ -124,6 +124,9 @@ if __name__=="__main__":
     y_pred_cv_pro = cross_val_predict(LR, data_pca, y, cv=kfold,method="predict_proba")
     fpr, tpr, _ = roc_curve(y, y_pred_cv_pro[:, 1], pos_label=1)
     auc = roc_auc_score(y, y_pred_cv)
+    f1 = f1_score(y,y_pred_cv,average='micro')
+    print('auc on cross validation is %0.2f' % auc)
+    print('f1 on cross validation is %0.2f' % f1)
     lw = 2
     plt.plot(fpr, tpr, 'k--', color='darkorange', lw=lw, label='ROC curve (area = %0.2f)' % auc)
     plt.plot([0, 1], [0, 1], color=(0.6, 0.6, 0.6), lw=lw, linestyle='--', label='random guessing')
@@ -182,15 +185,6 @@ if __name__=="__main__":
         else:
             stats.probplot(processed_x.iloc[:, i - 4], plot=plt)
     plt.show()
-
-    # Scatter diagram of distribution
-    for i in df.columns.tolist()[0:22]:
-        sns.stripplot(x=22, y=i, data=df, jitter=True, palette="Set2", dodge=False)
-        plt.show()
-    columns_list = processed_x.columns.tolist()
-    for i in columns_list[0:-1]:
-        sns.stripplot(x=columns_list[-1], y=i, data=processed_x, jitter=True, palette="Set2", dodge=False)
-        plt.show()
 
     # Model validation
     lr = LogisticRegression(**logistic_regression_params)
